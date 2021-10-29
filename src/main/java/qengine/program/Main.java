@@ -81,7 +81,7 @@ final class Main {
 	 */
 	public static void main(String[] args) throws Exception {
 		parseData();
-		parseQueries();
+		//parseQueries();
 	}
 
 	// ========================================================================
@@ -139,5 +139,7 @@ final class Main {
 			// Parsing et traitement de chaque triple par le handler
 			rdfParser.parse(dataReader, baseURI);
 		}
+
+		System.out.println(MainRDFHandler.dict);
 	}
 }
