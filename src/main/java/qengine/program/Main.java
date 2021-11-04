@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
@@ -52,6 +53,11 @@ final class Main {
 	 * Fichier contenant des données rdf
 	 */
 	static final String dataFile = workingDir + "sample_data.nt";
+
+	public static Integer counter = 1;
+	public static HashMap<String, Integer> dict = new HashMap<String, Integer>();
+
+	public static HashMap<String, Index> dictIndex = new HashMap<String, Index>();
 
 	// ========================================================================
 
@@ -129,6 +135,12 @@ final class Main {
 	 */
 	private static void parseData() throws FileNotFoundException, IOException {
 
+		dictIndex.put("spo",new Index("spo"));
+		dictIndex.put("sop",new Index("sop"));
+		dictIndex.put("pos",new Index("pos"));
+		dictIndex.put("pso",new Index("pso"));
+		dictIndex.put("ops",new Index("ops"));
+		dictIndex.put("osp",new Index("osp"));
 		try (Reader dataReader = new FileReader(dataFile)) {
 			// On va parser des données au format ntriples
 			RDFParser rdfParser = Rio.createParser(RDFFormat.NTRIPLES);
@@ -139,7 +151,9 @@ final class Main {
 			// Parsing et traitement de chaque triple par le handler
 			rdfParser.parse(dataReader, baseURI);
 		}
-
-		System.out.println(MainRDFHandler.dict);
+		
+		System.out.println(dict);
+		System.out.println("*******************************\n");
+		System.out.println(dictIndex);
 	}
 }
