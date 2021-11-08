@@ -49,7 +49,7 @@ public class Index {
     }
     @Override
     public String toString(){
-        String str =  this.order + "\n";
+        String str =  "";
         for(int[] e : this.indexMat)
         {
             str+= "[" + e[0] + ", " + e[1] + ", " + e[2] + "]\n"; 
