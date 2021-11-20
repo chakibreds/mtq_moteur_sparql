@@ -40,16 +40,16 @@ public final class MainRDFHandler extends AbstractRDFHandler {
 			Main.dict.put(st.getObject().toString(), Main.counter);
 			Main.counter++;
 		}
-
+/* 
 		Main.dictIndex.get("spo").add(Main.dict.get(st.getSubject().toString()),Main.dict.get(st.getPredicate().toString()),Main.dict.get(st.getObject().toString()));
 
 
 		Main.dictIndex.get("sop").add(Main.dict.get(st.getSubject().toString()),Main.dict.get(st.getPredicate().toString()),Main.dict.get(st.getObject().toString()));
-
+ */
 
 		Main.dictIndex.get("pos").add(Main.dict.get(st.getSubject().toString()),Main.dict.get(st.getPredicate().toString()),Main.dict.get(st.getObject().toString()));
 
-
+/* 
 		Main.dictIndex.get("pso").add(Main.dict.get(st.getSubject().toString()),Main.dict.get(st.getPredicate().toString()),Main.dict.get(st.getObject().toString()));
 
 
@@ -57,6 +57,6 @@ public final class MainRDFHandler extends AbstractRDFHandler {
 
 
 		Main.dictIndex.get("osp").add(Main.dict.get(st.getSubject().toString()),Main.dict.get(st.getPredicate().toString()),Main.dict.get(st.getObject().toString()));
-
+ */
 	};
 }

@@ -37,6 +37,7 @@ public class Index {
         }
         int iDebut = listOfDicho.get(0); 
         int iFin = listOfDicho.get(1);
+        
         ArrayList<Integer> listOfResult =  new ArrayList<Integer>();
 
         for(int i = iDebut; i <= iFin ; i++){
@@ -49,10 +50,11 @@ public class Index {
         ArrayList<Integer> listOfFirst =  new ArrayList<Integer>();
         ArrayList<Integer> listOfsecond =  new ArrayList<Integer>();
         listOfFirst = dichoByColonne(0, this.indexMat.size()-1, first, 0);
+
         if(listOfFirst.isEmpty()){
             return listOfFirst;
         }
-        listOfsecond = dichoByColonne(listOfFirst.get(0), listOfsecond.get(1), first, 1);
+        listOfsecond = dichoByColonne(listOfFirst.get(0), listOfFirst.get(1), second, 1);
 
         return listOfsecond;
     }
@@ -66,7 +68,7 @@ public class Index {
         int debT = deb; 
         int finT = fin;
         // recherche de la première occurence de Val
-        while (!trouve &&  debT < finT){
+        while (!trouve &&  debT <= finT){
             med = (debT+finT)/2;
             if (this.indexMat.get(med)[col] == val ){
                 if ((med-1) > debT){
@@ -95,13 +97,14 @@ public class Index {
         if (!trouve){
             return IDebutFin;
         }
+
         trouve = false;
         debT = Idebut;
         finT = fin;
         IDebutFin.add(Idebut);
 
         // recherche de la dernière occurence de Val
-        while (!trouve &&  debT < finT){
+        while (!trouve &&  debT <= finT){
             med = (debT+finT)/2;
             if (this.indexMat.get(med)[col] == val ){
                 if ((med+1) < finT){

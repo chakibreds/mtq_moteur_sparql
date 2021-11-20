@@ -56,7 +56,7 @@ final class Main {
 	/**
 	 * Fichier contenant des données rdf
 	 */
-	static String dataFile = workingDir + "sample_data.nt";
+	static String dataFile = workingDir + "100K.nt";
 
 	/**
 	 * Output directory
@@ -95,10 +95,10 @@ final class Main {
 	public static List<Integer> matchPattern(StatementPattern pattern, List<Integer> list) {
 		Index index = dictIndex.get("pos");
 		int p = dict.get(pattern.getPredicateVar().getValue().toString());
+
 		int o = dict.get(pattern.getObjectVar().getValue().toString());
 
-		List<Integer> reponseIndex = new ArrayList<Integer>();// = index.get(p, o);
-		
+		List<Integer> reponseIndex = index.get(p, o);
 		if (list == null) {
 			return reponseIndex;
 		}
@@ -141,8 +141,21 @@ final class Main {
 		dictIndex.put("ops",new Index("ops"));
 		dictIndex.put("osp",new Index("osp"));
 
-		parseData();
-		parseQueries();
+		List<Integer> list = new ArrayList<Integer>();
+		list.add(1);
+		list.add(2);
+		list.add(3);
+		list.add(4);
+
+		List<Integer> reponseIndex = new ArrayList<Integer>();
+		reponseIndex.add(2);
+		reponseIndex.add(3);
+
+		System.out.println(list.stream()
+		.filter(reponseIndex::contains)
+		.collect(Collectors.toList()));
+		//parseData();
+		//parseQueries();
 
 		int i = 1;
 		for (List<String> reponse : reponses) {
