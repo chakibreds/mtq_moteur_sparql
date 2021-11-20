@@ -6,10 +6,14 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.google.common.collect.HashBiMap;
 
 import org.eclipse.rdf4j.query.algebra.Projection;
 import org.eclipse.rdf4j.query.algebra.StatementPattern;
@@ -42,24 +46,67 @@ final class Main {
 	/**
 	 * Votre répertoire de travail où vont se trouver les fichiers à lire
 	 */
-	static final String workingDir = "data/";
+	static String workingDir = "data/";
 
 	/**
 	 * Fichier contenant les requêtes sparql
 	 */
-	static final String queryFile = workingDir + "sample_query.queryset";
+	static String queryFile = workingDir + "sample_query.queryset";
 
 	/**
 	 * Fichier contenant des données rdf
 	 */
-	static final String dataFile = workingDir + "sample_data.nt";
+	static String dataFile = workingDir + "sample_data.nt";
 
+	/**
+	 * Output directory
+	 */
+	static String outputDir = "output/";
+
+	/**
+	 *  
+	 * */
+	static boolean export_query_results = false; 
+
+	/**
+	 * Dictionnaire contenant les données et leur valeurs.
+	 */
 	public static Integer counter = 1;
-	public static HashMap<String, Integer> dict = new HashMap<String, Integer>();
+	public static HashBiMap<String, Integer> dict = HashBiMap.create();
 
+	/**
+	 *  Dictionnaire contenant les six indexes
+	 */
 	public static HashMap<String, Index> dictIndex = new HashMap<String, Index>();
 
+	/**
+	 * Liste contenant les réponses de chaque requête
+	 */
+	//public static Integer reponsesCounter = 0;
+	public static List<List<String>> reponses = new ArrayList<List<String>>();
+
+
 	// ========================================================================
+
+	/**
+	 * Méthode qui prend en entrée un seul pattern de requête et une liste de valeurs
+	 * et qui retourne une sous-liste de valeurs correspondant aux valeurs matchant le pattern
+	 */
+	public static List<Integer> matchPattern(StatementPattern pattern, List<Integer> list) {
+		Index index = dictIndex.get("pos");
+		int p = dict.get(pattern.getPredicateVar().getValue().toString());
+		int o = dict.get(pattern.getObjectVar().getValue().toString());
+
+		List<Integer> reponseIndex = new ArrayList<Integer>();// = index.get(p, o);
+		
+		if (list == null) {
+			return reponseIndex;
+		}
+
+		return list.stream()
+				.filter(reponseIndex::contains)
+				.collect(Collectors.toList());
+	}
 
 	/**
 	 * Méthode utilisée ici lors du parsing de requête sparql pour agir sur l'objet obtenu.
@@ -67,19 +114,20 @@ final class Main {
 	public static void processAQuery(ParsedQuery query) {
 		List<StatementPattern> patterns = StatementPatternCollector.process(query.getTupleExpr());
 
-		System.out.println("first pattern : " + patterns.get(0));
+		Iterator<StatementPattern> pattern = patterns.iterator();
 
-		System.out.println("object of the first pattern : " + patterns.get(0).getObjectVar().getValue());
+		List<Integer> reponse =  null;
+		if (!pattern.hasNext()) reponse = new ArrayList<Integer>();
 
-		System.out.println("variables to project : ");
+		while(pattern.hasNext()) {
+			reponse = matchPattern(pattern.next(), reponse);
+			if (reponse.isEmpty()) break;
+		}
 
-		// Utilisation d'une classe anonyme
-		query.getTupleExpr().visit(new AbstractQueryModelVisitor<RuntimeException>() {
-
-			public void meet(Projection projection) {
-				System.out.println(projection.getProjectionElemList().getElements());
-			}
-		});
+		// transalte it to reponse<String>
+		reponses.add(reponse.stream()
+			.map(e -> dict.inverse().get(e))
+			.collect(Collectors.toList()));
 	}
 
 	/**
@@ -94,15 +142,34 @@ final class Main {
 		dictIndex.put("osp",new Index("osp"));
 
 		parseData();
-		//parseQueries();
+		parseQueries();
 
-		System.out.println("\nDictionnaire: \n");
-		System.out.println(dict);
-		System.out.println("\n*******************************\nAffichage des indexes: \n");
-		System.out.println(dictIndex);
+		int i = 1;
+		for (List<String> reponse : reponses) {
+			System.out.println("Reponse "+ i +" : ");
+			System.out.println(reponse);
+			System.out.println("-----------------------");
+		}
 	}
 
 	// ========================================================================
+	private boolean parseArg(String[] args) {
+		for (int i = 1 ; i < args.length ; i++) {
+			if (args[i].equals("-queries") && (++i < args.length)) {
+				queryFile = args[i];
+			} else if (args[i].equals("-data") && (++i < args.length)) {
+				dataFile = args[i];
+			} else if (args[i].equals("-output") && (++i < args.length)) {
+				outputDir = args[i];
+			} else if (args[i].equals("export_query_results")){
+				export_query_results = true;
+			} else {
+				// print error and exit
+				return false;
+			}
+		}
+		return true;
+	}
 
 	/**
 	 * Traite chaque requête lue dans {@link #queryFile} avec {@link #processAQuery(ParsedQuery)}.
