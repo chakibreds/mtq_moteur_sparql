@@ -141,43 +141,52 @@ final class Main {
 		dictIndex.put("ops",new Index("ops"));
 		dictIndex.put("osp",new Index("osp"));
 
-		List<Integer> list = new ArrayList<Integer>();
-		list.add(1);
-		list.add(2);
-		list.add(3);
-		list.add(4);
+		if (!parseArg(args)) {
+			System.err.println("Erreur lors du parsing des arguments");
+			System.err.println("Pour afficher les options: java -jar rdfengine -help");
+			System.exit(1);
+		}
 
-		List<Integer> reponseIndex = new ArrayList<Integer>();
-		reponseIndex.add(2);
-		reponseIndex.add(3);
+		System.out.println("Chargement des données depuis '" + dataFile + "'.");
+		parseData();
 
-		System.out.println(list.stream()
-		.filter(reponseIndex::contains)
-		.collect(Collectors.toList()));
-		//parseData();
-		//parseQueries();
+		System.out.println("Execution des requêtes contenu dans '" + queryFile + "'.");
+		parseQueries();
 
 		int i = 1;
 		for (List<String> reponse : reponses) {
-			System.out.println("Reponse "+ i +" : ");
+			System.out.println("Reponse "+ i++ +" : ");
 			System.out.println(reponse);
 			System.out.println("-----------------------");
 		}
 	}
 
+	public static void exportQueryResults() {
+		//! Définir le format du fichier CSV à créer 
+	}
+
 	// ========================================================================
-	private boolean parseArg(String[] args) {
-		for (int i = 1 ; i < args.length ; i++) {
+	public static boolean parseArg(String[] args) {
+		for (int i = 0 ; i < args.length ; i++) {
 			if (args[i].equals("-queries") && (++i < args.length)) {
 				queryFile = args[i];
 			} else if (args[i].equals("-data") && (++i < args.length)) {
 				dataFile = args[i];
 			} else if (args[i].equals("-output") && (++i < args.length)) {
 				outputDir = args[i];
-			} else if (args[i].equals("export_query_results")){
+				if (outputDir.charAt(outputDir.length()-1) != '/')
+					outputDir += '/';
+			} else if (args[i].equals("-export_query_results")){
 				export_query_results = true;
-			} else {
-				// print error and exit
+			} else if(args[i].equals("-help")) {
+				System.out.println("java -jar rdfengine");
+				System.out.println("\t-queries '/chemin/vers/fichier/requetes' : Fichier contenant les requêtes");
+				System.out.println("\t-data '/chemin/vers/fichier/donnees' :	 Fichier contenant les données");
+				System.out.println("\t-output '/chemin/vers/dossier/sortie':	 Dossier qui va contenir les resultats");
+				System.out.println("\t-export_query_result: 			Si specifié, export le resultat des requête dans un fichier csv");
+				System.exit(1);
+			}
+			else {
 				return false;
 			}
 		}

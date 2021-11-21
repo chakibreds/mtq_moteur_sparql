@@ -1,4 +1,6 @@
-
+QUERIES=data/extra_sample_query.queryset
+DATA=data/sample_data.nt
+OUTPUT=output/
 
 
 all: compil run
@@ -10,4 +12,4 @@ compil:
 	javac @classpath.argfile -d ./target/classes/ ./src/main/java/qengine/program/*.java
 
 run: 
-	java @classpath.argfile qengine.program.Main
+	java @classpath.argfile qengine.program.Main -queries $(QUERIES) -data $(DATA) -output $(OUTPUT)
