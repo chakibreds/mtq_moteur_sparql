@@ -2,6 +2,7 @@ package qengine.program;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
@@ -10,14 +11,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.google.common.collect.HashBiMap;
 
-import org.eclipse.rdf4j.query.algebra.Projection;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.eclipse.rdf4j.query.algebra.StatementPattern;
-import org.eclipse.rdf4j.query.algebra.helpers.AbstractQueryModelVisitor;
 import org.eclipse.rdf4j.query.algebra.helpers.StatementPatternCollector;
 import org.eclipse.rdf4j.query.parser.ParsedQuery;
 import org.eclipse.rdf4j.query.parser.sparql.SPARQLParser;
@@ -92,20 +95,38 @@ final class Main {
 	 * Méthode qui prend en entrée un seul pattern de requête et une liste de valeurs
 	 * et qui retourne une sous-liste de valeurs correspondant aux valeurs matchant le pattern
 	 */
-	public static List<Integer> matchPattern(StatementPattern pattern, List<Integer> list) {
+	public static SortedSet<Integer> matchPattern(StatementPattern pattern, SortedSet<Integer> list) {
 		Index index = dictIndex.get("pos");
-		int p = dict.get(pattern.getPredicateVar().getValue().toString());
+		int p,o;
+		try {
+			p = dict.get(pattern.getPredicateVar().getValue().toString());
+			o = dict.get(pattern.getObjectVar().getValue().toString());
+		} catch(NullPointerException e) {
+			return new TreeSet<Integer>();
+		}
 
-		int o = dict.get(pattern.getObjectVar().getValue().toString());
-
-		List<Integer> reponseIndex = index.get(p, o);
+		SortedSet<Integer> reponseIndex = index.get(p, o);
 		if (list == null) {
 			return reponseIndex;
 		}
 
-		return list.stream()
+		SortedSet<Integer> merge = new TreeSet<Integer>();
+
+		while (!list.isEmpty() && !reponseIndex.isEmpty()) {
+			if (list.first() == reponseIndex.first()){
+				merge.add(list.first());
+				list.remove(list.first());
+				reponseIndex.remove(reponseIndex.first());
+			} else if (list.first() < reponseIndex.first()) {
+				list.remove(list.first());
+			} else {
+				reponseIndex.remove(reponseIndex.first());
+			}
+		}
+		return merge;
+		/* return list.stream()
 				.filter(reponseIndex::contains)
-				.collect(Collectors.toList());
+				.collect(Collectors.toList()); */
 	}
 
 	/**
@@ -116,8 +137,8 @@ final class Main {
 
 		Iterator<StatementPattern> pattern = patterns.iterator();
 
-		List<Integer> reponse =  null;
-		if (!pattern.hasNext()) reponse = new ArrayList<Integer>();
+		SortedSet<Integer> reponse =  null;
+		if (!pattern.hasNext()) reponse = new TreeSet<Integer>();
 
 		while(pattern.hasNext()) {
 			reponse = matchPattern(pattern.next(), reponse);
@@ -153,16 +174,28 @@ final class Main {
 		System.out.println("Execution des requêtes contenu dans '" + queryFile + "'.");
 		parseQueries();
 
-		int i = 1;
-		for (List<String> reponse : reponses) {
-			System.out.println("Reponse "+ i++ +" : ");
-			System.out.println(reponse);
-			System.out.println("-----------------------");
-		}
+		if (export_query_results)
+			exportQueryResults();
+			
 	}
 
 	public static void exportQueryResults() {
-		//! Définir le format du fichier CSV à créer 
+		String fileName = outputDir + "queryResult.csv";
+		// write all the results in a csv file
+		try {
+			FileWriter writer = new FileWriter(fileName);
+			CSVPrinter printer = new CSVPrinter(writer, CSVFormat.DEFAULT);
+			printer.printRecord("Query", "Result");
+			for (int i = 0; i < reponses.size(); i++) {
+				printer.printRecord(i+1, reponses.get(i));
+			}
+			printer.flush();
+			printer.close();
+			System.out.println("Résultat écrit dans le fichier '"+ fileName + "'.");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	// ========================================================================

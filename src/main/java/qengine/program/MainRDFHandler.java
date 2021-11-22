@@ -1,8 +1,5 @@
 package qengine.program;
 
-import java.util.HashMap;
-
-
 //import org.apache.http.client.cache.Resource;
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.rio.helpers.AbstractRDFHandler;
@@ -21,9 +18,6 @@ import org.eclipse.rdf4j.rio.helpers.AbstractRDFHandler;
  * </p>
  */
 public final class MainRDFHandler extends AbstractRDFHandler {
-
-	
-
 	@Override
 	public void handleStatement(Statement st) {
 		if (!Main.dict.containsKey(st.getSubject().toString())) {
