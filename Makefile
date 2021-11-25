@@ -13,3 +13,6 @@ compil:
 
 run: 
 	java @classpath.argfile qengine.program.Main -queries $(QUERIES) -data $(DATA) -output $(OUTPUT) -export_query_results
+
+jar:
+	jar cvf rdfengine.jar -M ./target/classes/qengine/program/*.class
