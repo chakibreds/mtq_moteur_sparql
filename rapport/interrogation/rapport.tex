@@ -20,7 +20,7 @@
 \definecolor{grey}{rgb}{0.27,0.27,0.27}
 
 \lstset{
-  backgroundcolor=\color{grey},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
+  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
   basicstyle=\footnotesize,        % the size of the fonts that are used for the code
   breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
   breaklines=true,                 % sets automatic line breaking
@@ -38,7 +38,7 @@
   numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
   numbersep=5pt,                   % how far the line-numbers are from the code
   numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
-  rulecolor=\color{white},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  %rulecolor=\color{white},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
   showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
   showstringspaces=false,          % underline spaces within strings only
   showtabs=false,                  % show tabs within strings adding particular underscores
@@ -147,17 +147,36 @@ Concrètement, le dictionnaire est implémenté par une instace de la classe \te
 
 \subsubsection{Indexes}
 
+Les indexes sont au coeur de l'approche \textit{hexastore}. Cette approche consiste à définir six indexes. Chaque index contient tout les triplets de la base de données suivant un certain ordre sur ces termes. Ainsi l'index suivant l'ordre \textit{Sujet > Prédicat > Objet} peut-être représenté par un tableau ou la première colonne contient les indentifiants des sujet du triplet, la deuxième colonne contient les prédicat et la dernière contient les objets. Les tuples sont ordonnés d'abords sur la première colonne, puis sur la deuxième ensuite sur la dernière.
+
+Cette approche permet de minimiser le temps de recherche de l'existance d'un tuple dans la base. Donc si on recherche un tuple oû le sujet est la variable (du style : \textit{?x habite Montpellier}), alors on utilisera un des deux indexes qui met le sujet en dernier. Ici, on utilisera par exemple l'index suivant l'ordre \textit{Objet > Prédicat > Sujet} pour trouver les sujets qui habite à Montpellier.
+
+Dans notre implémentation, on a commencé par définir une classe \textit{Index} qui représente un seul index. Cette classe a comme premier attribut \textit{order}, une chaîne de caractère contenant l'ordre dans lequel sont stockés les termes de chaque triplet. Par exmple pour l'ordre \textit{Sujet > Prédicat > Objet}, l'attribut \textit{order = "spo"}. Cela nous permet de savoir dans quel type d'index on est.
+
+L'index, à proprement parler, est définit comme une imbrication de deux instances de la classe \textit{HashMap} suivit d'une instance de la classe \textit{TreeSet}. La première instance de la classe \textit{HashMap} est un mapping entre l'indentifiant du premier terme \textit{$t_1$} et une autre instance de la classe \textit{HashMap}. Cette dernière, quant à elle, est un mapping entre l'indentifiant du second terme \textit{$t_2$} et une instance de la classe \textit{TreeSet}. Cette instance contient l'ensemble ordonné des derniers termes du triplet composé de $t_1$ et $t_2$.
+
+\begin{lstlisting}[language=Java]
+	private HashMap<Integer, HashMap<Integer, TreeSet<Integer>>> indexMat;
+\end{lstlisting}
+
+En utilisant cette structure, la recherche au sein d'index se fait par un simple \textit{indexMat.get(int, int)} qui a une complexité constante.
+
 \subsection{Évaluation des requêtes}
 
-\subsubsection{Structure}
+Le programme prend en paramètre un fichier contenant toutes les requêtes à exécuter.
+Dans cette partie, nous détaillerons la partie d'évaluation des requêtes. La lecture et l'évaluation des requêtes se fait de façon parallèle. C'est à dire que le programme interprète une requête puis l'évalue et donne son résultat avant de passer à la suivante.
 
 \subsubsection{Lecture}
 
+La lecture et l'interprètation d'une requête se fait par la méthode \textit{parseQuery} de la classe \textit{SPARQLParser} de la bibliothèque \textit{rdf4j}. Elle retourne un objet de la classe \textit{ParsedQuery} qui permet d'acceder à chaque pattern de la requête ainsi que les attributs de ce pattern grâce à différentes méthodes qu'on ne vas pas détailler ici.
+
+Les requêtes considèrer ici sont des requêtes en étoiles oû la variable est toujours le sujet. Donc on a decider de n'utiliser que l'index \textit{"pos"}.
+
 \subsubsection{Évaluation}
 
-\paragraph{matchPattern}
+Afin d'évaluer une requête, on a définit la méthode \textit{processAQuery} qui prends en paramètre une instance de la classe \textit{ParsedQuery} qui se charge d'évaluer la requête. Pour çela, on parcours les patterns (triplets) de la requête un à un et on recherche, au sein de notre index, les sujets apparaissant avec l'objet et le prédicat de ce pattern.
 
-\paragraph{Intersection de chaque pattern}
+On réalise une intersection entre le résultat du premier pattern avec le second, ainsi de suite jusqu'à la fin de la requête. Puisque nous manipulant à ce stade des ensembles ordonnés, cette intersection est faite grâce à un \textit{sort-merge-join} afin d'optimiser le temps d'évaluation finale.
 
 \subsection{Résultats}
 
