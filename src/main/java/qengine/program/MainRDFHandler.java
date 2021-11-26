@@ -20,6 +20,7 @@ import org.eclipse.rdf4j.rio.helpers.AbstractRDFHandler;
 public final class MainRDFHandler extends AbstractRDFHandler {
 	@Override
 	public void handleStatement(Statement st) {
+		Main.nb_triplet++;
 		if (!Main.dict.containsKey(st.getSubject().toString())) {
 			Main.dict.put(st.getSubject().toString(), Main.counter);
 			Main.counter++;
@@ -35,11 +36,11 @@ public final class MainRDFHandler extends AbstractRDFHandler {
 			Main.counter++;
 		}
 
-		Main.dictIndex.get("spo").add(Main.dict.get(st.getSubject().toString()),Main.dict.get(st.getPredicate().toString()),Main.dict.get(st.getObject().toString()));
-		Main.dictIndex.get("sop").add(Main.dict.get(st.getSubject().toString()),Main.dict.get(st.getPredicate().toString()),Main.dict.get(st.getObject().toString()));
+		//Main.dictIndex.get("spo").add(Main.dict.get(st.getSubject().toString()),Main.dict.get(st.getPredicate().toString()),Main.dict.get(st.getObject().toString()));
+		//Main.dictIndex.get("sop").add(Main.dict.get(st.getSubject().toString()),Main.dict.get(st.getPredicate().toString()),Main.dict.get(st.getObject().toString()));
 		Main.dictIndex.get("pos").add(Main.dict.get(st.getSubject().toString()),Main.dict.get(st.getPredicate().toString()),Main.dict.get(st.getObject().toString()));
-		Main.dictIndex.get("pso").add(Main.dict.get(st.getSubject().toString()),Main.dict.get(st.getPredicate().toString()),Main.dict.get(st.getObject().toString()));
+		//Main.dictIndex.get("pso").add(Main.dict.get(st.getSubject().toString()),Main.dict.get(st.getPredicate().toString()),Main.dict.get(st.getObject().toString()));
 		Main.dictIndex.get("ops").add(Main.dict.get(st.getSubject().toString()),Main.dict.get(st.getPredicate().toString()),Main.dict.get(st.getObject().toString()));
-		Main.dictIndex.get("osp").add(Main.dict.get(st.getSubject().toString()),Main.dict.get(st.getPredicate().toString()),Main.dict.get(st.getObject().toString()));
+		//Main.dictIndex.get("osp").add(Main.dict.get(st.getSubject().toString()),Main.dict.get(st.getPredicate().toString()),Main.dict.get(st.getObject().toString()));
 	};
 }

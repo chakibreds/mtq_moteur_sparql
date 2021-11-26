@@ -75,6 +75,7 @@ final class Main {
 	 * Dictionnaire contenant les données et leur valeurs.
 	 */
 	public static Integer counter = 1;
+	public static Integer nb_triplet = 0;
 	public static HashBiMap<String, Integer> dict = HashBiMap.create();
 
 	/**
@@ -88,6 +89,10 @@ final class Main {
 	//public static Integer reponsesCounter = 0;
 	public static List<List<String>> reponses = new ArrayList<List<String>>();
 
+	/**
+	 * List contenant les temps d'exécutions
+	 */ 
+	public static HashMap<String, Double> timeExec = new HashMap<String, Double >();
 
 	// ========================================================================
 
@@ -144,7 +149,7 @@ final class Main {
 			reponse = matchPattern(pattern.next(), reponse);
 			if (reponse.isEmpty()) break;
 		}
-
+		
 		// transalte it to reponse<String>
 		reponses.add(reponse.stream()
 			.map(e -> dict.inverse().get(e))
@@ -155,6 +160,8 @@ final class Main {
 	 * Entrée du programme
 	 */
 	public static void main(String[] args) throws Exception {
+		double startAll = System.nanoTime();
+
 		dictIndex.put("spo",new Index("spo"));
 		dictIndex.put("sop",new Index("sop"));
 		dictIndex.put("pos",new Index("pos"));
@@ -168,14 +175,31 @@ final class Main {
 			System.exit(1);
 		}
 
+
+		double startTime = System.nanoTime();
 		System.out.println("Chargement des données depuis '" + dataFile + "'.");
 		parseData();
+		double endTime = System.nanoTime();
+		timeExec.put("load_data", (endTime - startTime)/1000000L);
 
+
+
+		startTime = System.nanoTime();
 		System.out.println("Execution des requêtes contenu dans '" + queryFile + "'.");
-		parseQueries();
+		int nb_queries = parseQueries();
+		endTime = System.nanoTime();
+		timeExec.put("eval_query", (endTime - startTime)/1000000L);
+
 
 		if (export_query_results)
 			exportQueryResults();
+
+		double endAll = System.nanoTime();
+
+		
+		timeExec.put("allTime", (endAll - startAll)/1000000L);
+		System.out.println(timeExec);
+		exportStats(dataFile, queryFile, nb_triplet, nb_queries);
 			
 	}
 
@@ -196,6 +220,25 @@ final class Main {
 			e.printStackTrace();
 		}
 
+	}
+
+	public static void exportStats(String dataFile, String queryFile, int nb_triplet, int nb_queries){
+		String fileName = outputDir + "stats.csv";
+		try {
+			FileWriter writer = new FileWriter(fileName);
+			CSVPrinter printer = new CSVPrinter(writer, CSVFormat.DEFAULT);
+
+			printer.printRecord("nom du fichier des données", "nom du fichier des reqûetes","nombre de triplets RDF","nombre de requêtes", "temps de lecture des données (ms) ", "temps de lecture des requêtes (ms)" , "temps création dico (ms)" , "nombre d’index" ,
+			"temps de création des index (ms)" , "temps total d’évaluation du workload (ms)"
+			, "temps total (du début à la fin du programme) (ms)");
+
+			printer.printRecord(dataFile, queryFile, nb_triplet, nb_queries, timeExec.get("load_data"), timeExec.get("eval_query"), "NON_DISPONIBLE", 2, "NON_DISPONIBLE", "NON_DISPONIBLE" , timeExec.get("allTime"));
+
+			printer.flush();
+			printer.close();
+		} catch (IOException e){
+			e.printStackTrace();
+		}
 	}
 
 	// ========================================================================
@@ -229,7 +272,7 @@ final class Main {
 	/**
 	 * Traite chaque requête lue dans {@link #queryFile} avec {@link #processAQuery(ParsedQuery)}.
 	 */
-	private static void parseQueries() throws FileNotFoundException, IOException {
+	private static int parseQueries() throws FileNotFoundException, IOException {
 		/**
 		 * Try-with-resources
 		 * 
@@ -239,6 +282,7 @@ final class Main {
 		 * On utilise un stream pour lire les lignes une par une, sans avoir à toutes les stocker
 		 * entièrement dans une collection.
 		 */
+		int counter=0;
 		try (Stream<String> lineStream = Files.lines(Paths.get(queryFile))) {
 			SPARQLParser sparqlParser = new SPARQLParser();
 			Iterator<String> lineIterator = lineStream.iterator();
@@ -255,13 +299,14 @@ final class Main {
 
 				if (line.trim().endsWith("}")) {
 					ParsedQuery query = sparqlParser.parseQuery(queryString.toString(), baseURI);
-
+					counter++;
 					processAQuery(query); // Traitement de la requête, à adapter/réécrire pour votre programme
 
 					queryString.setLength(0); // Reset le buffer de la requête en chaine vide
 				}
 			}
 		}
+		return counter;
 	}
 
 	/**
