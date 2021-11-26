@@ -41,3 +41,4 @@ output/
 *.fls  
 *.log  
 *.synctex.gz
+*.out

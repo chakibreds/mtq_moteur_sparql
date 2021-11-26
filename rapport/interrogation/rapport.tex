@@ -8,6 +8,59 @@
 \usepackage{amssymb}
 \usepackage[top=1.5cm, bottom=1.5cm, left=1.5cm, right=1.5cm]{geometry}
 \usepackage{graphicx}
+\usepackage{hyperref}
+
+% Bout de code
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+\definecolor{grey}{rgb}{0.27,0.27,0.27}
+
+\lstset{
+  backgroundcolor=\color{grey},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
+  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+  deletekeywords={...},            % if you want to delete keywords from the given language
+  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+  firstnumber=0,                   % start line enumeration with line 1000
+  frame=single,	                   % adds a frame around the code
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{mygreen},       % keyword style
+  %language=C++,                    % the language of the code
+  morekeywords={*,...},            % if you want to add more keywords to the set
+  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+  numbersep=5pt,                   % how far the line-numbers are from the code
+  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+  rulecolor=\color{white},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=1,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{mymauve},     % string literal style
+  tabsize=2,	                   % sets default tabsize to 2 spaces
+  literate=
+  {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+  {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+  {à}{{\`a}}1 {è}{{\`e}}1 {ì}{{\`i}}1 {ò}{{\`o}}1 {ù}{{\`u}}1
+  {À}{{\`A}}1 {È}{{\'E}}1 {Ì}{{\`I}}1 {Ò}{{\`O}}1 {Ù}{{\`U}}1
+  {ä}{{\"a}}1 {ë}{{\"e}}1 {ï}{{\"i}}1 {ö}{{\"o}}1 {ü}{{\"u}}1
+  {Ä}{{\"A}}1 {Ë}{{\"E}}1 {Ï}{{\"I}}1 {Ö}{{\"O}}1 {Ü}{{\"U}}1
+  {â}{{\^a}}1 {ê}{{\^e}}1 {î}{{\^i}}1 {ô}{{\^o}}1 {û}{{\^u}}1
+  {Â}{{\^A}}1 {Ê}{{\^E}}1 {Î}{{\^I}}1 {Ô}{{\^O}}1 {Û}{{\^U}}1
+  {Ã}{{\~A}}1 {ã}{{\~a}}1 {Õ}{{\~O}}1 {õ}{{\~o}}1
+  {œ}{{\oe}}1 {Œ}{{\OE}}1 {æ}{{\ae}}1 {Æ}{{\AE}}1 {ß}{{\ss}}1
+  {ű}{{\H{u}}}1 {Ű}{{\H{U}}}1 {ő}{{\H{o}}}1 {Ő}{{\H{O}}}1
+  {ç}{{\c c}}1 {Ç}{{\c C}}1 {ø}{{\o}}1 {å}{{\r a}}1 {Å}{{\r A}}1
+  {€}{{\euro}}1 {£}{{\pounds}}1 {«}{{\guillemotleft}}1
+  {»}{{\guillemotright}}1 {ñ}{{\~n}}1 {Ñ}{{\~N}}1 {¿}{{?`}}1
+}
 
 \begin{document}
 
@@ -42,29 +95,36 @@ Kezzoul Massili
 
 \subsection*{Objectifs du projet}
 
-Quels sont, en bref, les objectifs du projet ?
+L'objectifs du projet est, dans un premier temps, de développer un mini moteur de requête en étoiles en utilisant l'approche \textit{hexastore}. Puis, dans un second temps, analyser les performances de cette approche en fonction de plusieur jeux de données. L'approche hexastore consiste à utiliser six indexes pour stocker les données. Çela permet d'évaluer des requêtes de façon plus efficace. 
+
+La partie d'analyse des performances sera traitée dans le rapport suivant.
 
 \subsection*{Environnement de développement}
 
-Utilisation de Maven, VSCode et d'un Makefile au lieu de l'environnement Eclipse. Pourquoi ?
-Détailler l'environnement de développement (Github tout ça tout ça).
+Le projet a été développé sur notre propre environnement de travail. Nous avons choisi de ne pas utiliser l'environnement \textit{Eclipse} car ce dernier est très lourd et peine à s'exécuter correctement sur nos machines. Afin de palier au problème des dépendances, nous avons utilisé \textit{Maven} qui est un outil de gestion et d'automatisation de production des projets logiciels \textit{Java}. Nous avons aussi utilisé le logiciel \textit{Make} dans le but de faciliter au mieux l'initialistion de l'environnement (téléchargement des dépendances), la compilation des fichiers sources, l'exécution du programme ainsi que la création du fichier \textit{jar} qui sera ensuite utilisé pour l'exécution du programme. Aussi, afin de faciliter la coopération avec mon binôme, nous avons utilisé \textit{Git} à travers le service \href{https://github.com/chakibreds/mtq_moteur_sparql}{\textit{Github}} pour la gestion du code. 
+
+Le programme est écrit en \textit{Java}\footnote{La version de java utilisé lors du développement du projet est la version 11.0}. Le projet utilise deux bibliothèques externes :
+\begin{itemize}
+	\item \textit{rdf4j} pour lire les données rdf et requêtes sparql
+	\item \textit{jena} qui sera utilisée pour comparaison dans la phase d’analyse des performances
+\end{itemize}
 
 \subsection*{Structure du projet}
 
-Expliquer brievement la structure (physique) du projet. (Détailler les fichiers, les dossiers, les répertoires, etc.)
+Pour une meilleur compréhension de l'environnement du projet, voici ci-dessous différentes informations sur les différents fichiers et répertoire du projet.
 
 \begin{description}
-	\item[\textit{src/}] ...
-	\item[\textit{target/}] ...
-	\item[\textit{data/}] ...
+	\item[\textit{src/}] Répertoire contenant les fichiers sources du projet.
+	\item[\textit{target/}] Répertoire contenant les fichiers générés (les \textit{.class}) durant la production ainsi que les dépendances lier au projet.
+	\item[\textit{data/}] Répertoire contenant les différents jeux de données.
 	\begin{description}
-		\item[Jeu de données] fichiers.nt
-		\item[Requêtes] fichiers.queryset
+		\item[Jeu de données] Les \textit{fichiers.nt} contiennent les données au format \href{https://fr.wikipedia.org/wiki/Notation3}{N3}.
+		\item[Requêtes] Les {fichiers.queryset} contiennent plusieurs requêtes au format \href{https://fr.wikipedia.org/wiki/SPARQL}{SPARQL}.
 	\end{description}
-		\item[\textit{output/}] ...	
-		\item[\textit{README.md}] ...
-		\item[\textit{Makefile}] ...
-		\item[\textit{pom.xml}] ...
+		\item[\textit{output/}] Répertoire contenant toute les sorties du programme.	
+		\item[\textit{README.md}] Fichier expliquant la manière d'utiliser le programme (initialistion, compilation et exécution). Referez-vous à la section \textit{Utilisation} de ce dernier pour plus d'informations.
+		\item[\textit{Makefile}] Fichier qui spécifient les commandes de compilation, initialistion et autres.
+		\item[\textit{pom.xml}] Fichier qui contient les informations nécessaires à Maven pour traiter le projet (nom du projet, dépendances vers d'autres projets, bibliothèques nécessaires à la compilation etc.).
 \end{description}
 
 \section{Modèlisations et implémentation}
@@ -73,7 +133,17 @@ Expliquer brievement la structure (physique) du projet. (Détailler les fichiers
 
 \subsubsection{Jeu de données}
 
+La premier étape consiste à charger les données en mémoire vive. Les données sont dans le format \href{https://fr.wikipedia.org/wiki/Notation3}{N3}. Pour les charger, nous utilisons la méthode \textit{parseData()} de la classe principale qui, pour chaque triplet RDF du fichier, fait appel à la méthode \textit{handleStatement(Statement)} de la classe \textit{MainRDFHandler}. Cette méthode ajoute le triplet dans les six indexes. Le sujet, prédicat ainsi que l'objet du triplet sont quand à eux ajouté dans le dictionnaire oû un entier unique est associé à chaque URI. Évidemment, les doublons sont ingorés.
+
 \subsubsection{Dictionnaire}
+
+Le dictionnaire associe pour chaque URI un entier unique. Cet entier est utilisé pour identifier les URI dans les indexes. Cela permet, d'une part, de ne pas avoir à comparer les URI en tant que chaîne de caractère. Opération qui est plus couteuse. Mais aussi, puisque la taille d'un entier est infèrieur à la taille d'une chaîne de caractère, de réduire la taille finale des indexes.
+
+Concrètement, le dictionnaire est implémenté par une instace de la classe \textit{HashBiMap<String, Integer>}. La classe \textit{HashBiMap} est une classe de mapping entre deux types de données. À la différence de la classe \textit{HashMap}, la classe \textit{HashBiMap} ajoute une contrainte d'unicité sur les valeurs des ses éléments. Cette contrainte permet d'activer une \textit{vue inverse} du dictionnaire. C'est à dire, à partir de l'entier unique associé à une URI, on peut retrouver l'URI associée en un temps constant.
+
+\begin{lstlisting}[language=Java]
+	public static HashBiMap<String, Integer> dict = HashBiMap.create();
+\end{lstlisting}
 
 \subsubsection{Indexes}
 
@@ -95,9 +165,9 @@ Expliquer brievement la structure (physique) du projet. (Détailler les fichiers
 
 Fichier CSV en sortie du programme.
 
-\paragraph{Validation}
+\paragraph{Temps d'exécution}
 
-Étape de validation des résultats.
+Calcul des temps d'exécution.
 
 \section{Conclusion}
 
