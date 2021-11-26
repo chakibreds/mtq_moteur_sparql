@@ -20,6 +20,7 @@ import org.eclipse.rdf4j.rio.helpers.AbstractRDFHandler;
 public final class MainRDFHandler extends AbstractRDFHandler {
 	@Override
 	public void handleStatement(Statement st) {
+		double start = System.nanoTime();
 		Main.nb_triplet++;
 		if (!Main.dict.containsKey(st.getSubject().toString())) {
 			Main.dict.put(st.getSubject().toString(), Main.counter);
@@ -35,12 +36,31 @@ public final class MainRDFHandler extends AbstractRDFHandler {
 			Main.dict.put(st.getObject().toString(), Main.counter);
 			Main.counter++;
 		}
+		double end = System.nanoTime();
+		if(Main.timeExec.get("timeDico") == null){
+			Main.timeExec.put("timeDico", (end - start)/ 1000000L);
+		}
+		else{
+			double timeDico = Main.timeExec.get("timeDico");
+			timeDico += (end - start)/ 1000000L;
+			Main.timeExec.put("timeDico",timeDico);
+		}
 
-		//Main.dictIndex.get("spo").add(Main.dict.get(st.getSubject().toString()),Main.dict.get(st.getPredicate().toString()),Main.dict.get(st.getObject().toString()));
-		//Main.dictIndex.get("sop").add(Main.dict.get(st.getSubject().toString()),Main.dict.get(st.getPredicate().toString()),Main.dict.get(st.getObject().toString()));
+		start = System.nanoTime();
+		Main.dictIndex.get("spo").add(Main.dict.get(st.getSubject().toString()),Main.dict.get(st.getPredicate().toString()),Main.dict.get(st.getObject().toString()));
+		Main.dictIndex.get("sop").add(Main.dict.get(st.getSubject().toString()),Main.dict.get(st.getPredicate().toString()),Main.dict.get(st.getObject().toString()));
 		Main.dictIndex.get("pos").add(Main.dict.get(st.getSubject().toString()),Main.dict.get(st.getPredicate().toString()),Main.dict.get(st.getObject().toString()));
-		//Main.dictIndex.get("pso").add(Main.dict.get(st.getSubject().toString()),Main.dict.get(st.getPredicate().toString()),Main.dict.get(st.getObject().toString()));
+		Main.dictIndex.get("pso").add(Main.dict.get(st.getSubject().toString()),Main.dict.get(st.getPredicate().toString()),Main.dict.get(st.getObject().toString()));
 		Main.dictIndex.get("ops").add(Main.dict.get(st.getSubject().toString()),Main.dict.get(st.getPredicate().toString()),Main.dict.get(st.getObject().toString()));
-		//Main.dictIndex.get("osp").add(Main.dict.get(st.getSubject().toString()),Main.dict.get(st.getPredicate().toString()),Main.dict.get(st.getObject().toString()));
+		Main.dictIndex.get("osp").add(Main.dict.get(st.getSubject().toString()),Main.dict.get(st.getPredicate().toString()),Main.dict.get(st.getObject().toString()));
+		end = System.nanoTime();
+		if(Main.timeExec.get("timeIndex") == null){
+			Main.timeExec.put("timeIndex", (end - start) / 1000000L);
+		}
+		else{
+			double timeIndex = Main.timeExec.get("timeIndex");
+			timeIndex += (end - start)/ 1000000L;
+			Main.timeExec.put("timeIndex",timeIndex);
+		}
 	};
 }

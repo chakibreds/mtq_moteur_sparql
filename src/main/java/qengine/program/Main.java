@@ -184,11 +184,8 @@ final class Main {
 
 
 
-		startTime = System.nanoTime();
 		System.out.println("Execution des requêtes contenu dans '" + queryFile + "'.");
 		int nb_queries = parseQueries();
-		endTime = System.nanoTime();
-		timeExec.put("eval_query", (endTime - startTime)/1000000L);
 
 
 		if (export_query_results)
@@ -199,6 +196,7 @@ final class Main {
 		
 		timeExec.put("allTime", (endAll - startAll)/1000000L);
 		System.out.println(timeExec);
+		
 		exportStats(dataFile, queryFile, nb_triplet, nb_queries);
 			
 	}
@@ -232,7 +230,7 @@ final class Main {
 			"temps de création des index (ms)" , "temps total d’évaluation du workload (ms)"
 			, "temps total (du début à la fin du programme) (ms)");
 
-			printer.printRecord(dataFile, queryFile, nb_triplet, nb_queries, timeExec.get("load_data"), timeExec.get("eval_query"), "NON_DISPONIBLE", 2, "NON_DISPONIBLE", "NON_DISPONIBLE" , timeExec.get("allTime"));
+			printer.printRecord(dataFile, queryFile, nb_triplet, nb_queries, timeExec.get("load_data"), timeExec.get("parseQueries"), timeExec.get("timeDico"), dictIndex.size(),  timeExec.get("timeIndex"), timeExec.get("processQueries") , timeExec.get("allTime"));
 
 			printer.flush();
 			printer.close();
@@ -287,24 +285,34 @@ final class Main {
 			SPARQLParser sparqlParser = new SPARQLParser();
 			Iterator<String> lineIterator = lineStream.iterator();
 			StringBuilder queryString = new StringBuilder();
-
+			double timeParseQueries = 0.0;
+			double timeProcessQueries = 0.0;
 			while (lineIterator.hasNext())
 			/*
 			 * On stocke plusieurs lignes jusqu'à ce que l'une d'entre elles se termine par un '}'
 			 * On considère alors que c'est la fin d'une requête
 			 */
 			{
+				double startParseQuery = System.nanoTime();
 				String line = lineIterator.next();
 				queryString.append(line);
 
 				if (line.trim().endsWith("}")) {
+					
 					ParsedQuery query = sparqlParser.parseQuery(queryString.toString(), baseURI);
 					counter++;
+					double endParseQuery = System.nanoTime();
+					timeParseQueries += (endParseQuery - startParseQuery)/1000000L;
+					double startProcessQuery = System.nanoTime();
 					processAQuery(query); // Traitement de la requête, à adapter/réécrire pour votre programme
-
+					double endProcessQuery = System.nanoTime();
+					timeProcessQueries = (endProcessQuery - startProcessQuery)/ 1000000L;
 					queryString.setLength(0); // Reset le buffer de la requête en chaine vide
 				}
+				
 			}
+			timeExec.put("parseQueries", timeParseQueries);
+			timeExec.put("processQueries", timeProcessQueries);
 		}
 		return counter;
 	}

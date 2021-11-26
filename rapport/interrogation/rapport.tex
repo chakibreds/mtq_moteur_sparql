@@ -163,20 +163,41 @@ Concrètement, le dictionnaire est implémenté par une instace de la classe \te
 
 \paragraph{Structure}
 
-Fichier CSV en sortie du programme.
+La Sortie du Programme est un fichier CSV, contenant deux attributs, le numéro de la requête
+et les résultats de la requête sous forme d'une liste contenant toutes les réponses de cette dernière.
+Cette exportation est faite grâce à l'option \textit{exportQueryResult}, cette option évoque la méthode \textit{exportQueryResult()} qui permet de transformer la liste des réponses de toutes les requêtes en un fichier CSV.
+
+Le numéro de la requête \textbf{i} dans le fichier CSV représente la requête numéro \textbf{i} dans le fichier des requête. On a pas exporter la requête en elle même, car on ne stocke pas les requête lors de leurs évaluation. Pour faire ça, il faut les stocker au paravant, ou de relire le fichier des requête lors de l'exportation des résultats, donc on a préféré de mettre le numéro dans le fichier CSV, au lieu de la requête en elle même.  
 
 \paragraph{Temps d'exécution}
+Les statistiques de notre programme sont exportés dans un fichier CSV contenant les informations suivantes : 
 
-Calcul des temps d'exécution.
+\begin{itemize}
+  \item nom du fichier des données.
+  \item nom du fichier contenant les requêtes.
+  \item nombre de triplets RDF
+  \item nombre de requêtes.
+  \item temps de lecture des données (ms) 
+  \item temps de lecture des requêtes (ms)
+  \item temps nécessaire pour la création du dictionnaire (ms).
+  \item temps nécessaire pour la création des indexes (ms). 
+  \item nombre d'indexes.
+  \item temps total d'évaluation du workload (ms). 
+  \item temps total de l'exécution du programme (ms).
+
+\end{itemize}
+
+Ces informations sont exportés à l'aide de la méthode \textit{exportStats()} et toutes ces informations sont disponibles.
 
 \section{Conclusion}
 
 \subsection{Utilisation du programme}
+Pour faciliter les tests de notre programme, il est exécutable via ligne de commande, grâce à notre \textit{Makfile} et la commande \textbf{make jar} qui permet de construire un exécutable .jar, aprés la construction du .jar on peut exécuter notre programme avec les options suivantes : 
+java -jar rdfqengine.jar -data "chemin_vers_fichier_données" -queries "chemin_vers_fichier_queries" -output "chemin_vers_dossier_sortie".
 
-Parler des différents arguments de la ligne de commande ainsi que de leur fonctionnement.
+Notre Programme reste compilable et exécutable via le \textit{Makfile} avec \textbf{make compil} et \textbf{make run}, mais il faut changer les options à partir du \textit{Makfile}.
+
 
 \subsection{Perspectives}
-
-Évaluer le temps d'exécution des requêtes.
-
+On a voulu faire une méthode de validation qui compare notre évaluation des requêtes avec une autre évaluation déjà validée (en utilisant Jena API par exemple).
 \end{document}
