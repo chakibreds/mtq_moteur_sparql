@@ -15,5 +15,5 @@ run:
 	java @classpath.argfile qengine.program.Main -queries $(QUERIES) -data $(DATA) -output $(OUTPUT) -export_query_results
 
 jar:
-	mvn clean package
+	mvn package
 	cp target/qengine-0.0.1-SNAPSHOT-jar-with-dependencies.jar ./rdfengine.jar

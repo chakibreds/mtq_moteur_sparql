@@ -192,10 +192,11 @@ final class Main {
 
 		
 		timeExec.put("allTime", (endAll - startAll)/1000000L);
-		System.out.println(timeExec);
+		System.out.println("\nTemps Total du chargement des données : "+ timeExec.get("load_data") + " ms"); 
+		System.out.println("Temps d'évaluation des requêtes : "+ timeExec.get("processQueries") + " ms"); 
+		System.out.println("Temps Total du programme: "+ timeExec.get("allTime") + " ms\n"); 
 		
 		exportStats(dataFile, queryFile, nb_triplet, nb_queries);
-			
 	}
 
 	public static void exportQueryResults() {
@@ -231,6 +232,7 @@ final class Main {
 
 			printer.flush();
 			printer.close();
+			System.out.println("Stats écrit dans le fichier '"+ fileName + "'.");
 		} catch (IOException e){
 			e.printStackTrace();
 		}
@@ -303,7 +305,7 @@ final class Main {
 					double startProcessQuery = System.nanoTime();
 					processAQuery(query); // Traitement de la requête, à adapter/réécrire pour votre programme
 					double endProcessQuery = System.nanoTime();
-					timeProcessQueries = (endProcessQuery - startProcessQuery)/ 1000000L;
+					timeProcessQueries += (endProcessQuery - startProcessQuery)/ 1000000L;
 					queryString.setLength(0); // Reset le buffer de la requête en chaine vide
 				}
 				
