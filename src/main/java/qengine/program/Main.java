@@ -129,9 +129,6 @@ final class Main {
 			}
 		}
 		return merge;
-		/* return list.stream()
-				.filter(reponseIndex::contains)
-				.collect(Collectors.toList()); */
 	}
 
 	/**

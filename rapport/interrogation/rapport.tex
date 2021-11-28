@@ -93,15 +93,15 @@ Kezzoul Massili
 
 \section*{Introduction}
 
-\subsection*{Objectifs du projet}
+\subsection*{Objectif du projet}
 
-L'objectifs du projet est, dans un premier temps, de développer un mini moteur de requête en étoiles en utilisant l'approche \textit{hexastore}. Puis, dans un second temps, analyser les performances de cette approche en fonction de plusieur jeux de données. L'approche hexastore consiste à utiliser six indexes pour stocker les données. Çela permet d'évaluer des requêtes de façon plus efficace. 
+L'objectif du projet est, dans un premier temps, de développer un mini-moteur de requête en étoiles en utilisant l'approche \textit{hexastore}. Puis dans un second temps, analyser les performances de cette approche en fonction de plusieurs jeux de données. L'approche \textit{hexastore} consiste à utiliser six index pour stocker les données. Cette méthode permet d'évaluer des requêtes de façon plus efficace.
 
-La partie d'analyse des performances sera traitée dans le rapport suivant.
+La partie d'analyse des performances sera traitée dans un futur rapport.
 
 \subsection*{Environnement de développement}
 
-Le projet a été développé sur notre propre environnement de travail. Nous avons choisi de ne pas utiliser l'environnement \textit{Eclipse} car ce dernier est très lourd et peine à s'exécuter correctement sur nos machines. Afin de palier au problème des dépendances, nous avons utilisé \textit{Maven} qui est un outil de gestion et d'automatisation de production des projets logiciels \textit{Java}. Nous avons aussi utilisé le logiciel \textit{Make} dans le but de faciliter au mieux l'initialistion de l'environnement (téléchargement des dépendances), la compilation des fichiers sources, l'exécution du programme ainsi que la création du fichier \textit{jar} qui sera ensuite utilisé pour l'exécution du programme. Aussi, afin de faciliter la coopération avec mon binôme, nous avons utilisé \textit{Git} à travers le service \href{https://github.com/chakibreds/mtq_moteur_sparql}{\textit{Github}} pour la gestion du code. 
+Le projet a été développé sur notre propre environnement de travail. Nous avons choisi de ne pas utiliser l'environnement \textit{Eclipse}, car ce dernier est très lourd et peine à s'exécuter correctement sur nos machines. Afin de palier au problème des dépendances, nous avons utilisé \textit{Maven} qui est un outil de gestion et d'automatisation de production des projets logiciels \textit{Java}. Nous avons aussi utilisé le logiciel \textit{Make} dans le but de faciliter au mieux l'initialisation de l'environnement (téléchargement des dépendances), la compilation des fichiers sources, l'exécution du programme ainsi que la création du fichier \textit{jar} qui sera ensuite utilisé pour l'exécution du programme. Aussi, afin de faciliter la coopération avec mon binôme, nous avons utilisé \textit{Git} à travers le service \href{https://github.com/chakibreds/mtq_moteur_sparql}{\textit{Github}} pour la gestion du code. 
 
 Le programme est écrit en \textit{Java}\footnote{La version de java utilisé lors du développement du projet est la version 11.0}. Le projet utilise deux bibliothèques externes :
 \begin{itemize}
@@ -111,7 +111,7 @@ Le programme est écrit en \textit{Java}\footnote{La version de java utilisé lo
 
 \subsection*{Structure du projet}
 
-Pour une meilleur compréhension de l'environnement du projet, voici ci-dessous différentes informations sur les différents fichiers et répertoire du projet.
+Pour une meilleure compréhension de l'environnement du projet, voici ci-dessous différentes informations sur les différents fichiers et répertoires du projet.
 
 \begin{description}
 	\item[\textit{src/}] Répertoire contenant les fichiers sources du projet.
@@ -121,10 +121,10 @@ Pour une meilleur compréhension de l'environnement du projet, voici ci-dessous 
 		\item[Jeu de données] Les \textit{fichiers.nt} contiennent les données au format \href{https://fr.wikipedia.org/wiki/Notation3}{N3}.
 		\item[Requêtes] Les {fichiers.queryset} contiennent plusieurs requêtes au format \href{https://fr.wikipedia.org/wiki/SPARQL}{SPARQL}.
 	\end{description}
-		\item[\textit{output/}] Répertoire contenant toute les sorties du programme.	
-		\item[\textit{README.md}] Fichier expliquant la manière d'utiliser le programme (initialistion, compilation et exécution). Referez-vous à la section \textit{Utilisation} de ce dernier pour plus d'informations.
-		\item[\textit{Makefile}] Fichier qui spécifient les commandes de compilation, initialistion et autres.
-		\item[\textit{pom.xml}] Fichier qui contient les informations nécessaires à Maven pour traiter le projet (nom du projet, dépendances vers d'autres projets, bibliothèques nécessaires à la compilation etc.).
+		\item[\textit{output/}] Répertoire contenant toutes les sorties du programme.	
+		\item[\textit{README.md}] Fichier expliquant la manière d'utiliser le programme (initialisation, compilation et exécution). Referez-vous à la section \textit{Utilisation} de ce dernier pour plus d'informations.
+		\item[\textit{Makefile}] Fichier qui spécifient les commandes de compilation, initialisation et autres.
+		\item[\textit{pom.xml}] Fichier qui contient les informations nécessaires à Maven pour traiter le projet (nom du projet, dépendances vers d'autres projets, bibliothèques nécessaires à la compilation, etc.).
 \end{description}
 
 \section{Modèlisations et implémentation}
@@ -133,90 +133,118 @@ Pour une meilleur compréhension de l'environnement du projet, voici ci-dessous 
 
 \subsubsection{Jeu de données}
 
-La premier étape consiste à charger les données en mémoire vive. Les données sont dans le format \href{https://fr.wikipedia.org/wiki/Notation3}{N3}. Pour les charger, nous utilisons la méthode \textit{parseData()} de la classe principale qui, pour chaque triplet RDF du fichier, fait appel à la méthode \textit{handleStatement(Statement)} de la classe \textit{MainRDFHandler}. Cette méthode ajoute le triplet dans les six indexes. Le sujet, prédicat ainsi que l'objet du triplet sont quand à eux ajouté dans le dictionnaire oû un entier unique est associé à chaque URI. Évidemment, les doublons sont ingorés.
+La première étape consiste à charger les données en mémoire vive. Les données sont dans le format \href{https://fr.wikipedia.org/wiki/Notation3}{N3}. Pour les charger, nous utilisons la méthode \textit{parseData()} de la classe principale qui, pour chaque triplet RDF du fichier, fait appel à la méthode \textit{handleStatement(Statement)} de la classe \textit{MainRDFHandler}. Cette méthode ajoute le triplet dans les six index. Le sujet, prédicat ainsi que l'objet du triplet sont quant à eux ajouté dans le dictionnaire où un entier unique est associé à chaque URI. Évidemment, les doublons sont ignorés.
 
 \subsubsection{Dictionnaire}
 
-Le dictionnaire associe pour chaque URI un entier unique. Cet entier est utilisé pour identifier les URI dans les indexes. Cela permet, d'une part, de ne pas avoir à comparer les URI en tant que chaîne de caractère. Opération qui est plus couteuse. Mais aussi, puisque la taille d'un entier est infèrieur à la taille d'une chaîne de caractère, de réduire la taille finale des indexes.
+Le dictionnaire associe pour chaque URI un entier unique. Cet entier est utilisé pour identifier les URI dans les index. Cela permet, d'une part, de ne pas avoir à comparer les URI en tant que chaîne de caractère. Opération qui est plus coûteuse. Mais aussi, puisque la taille d'un entier est inférieure à la taille d'une chaîne de caractère, de réduire la taille finale des index.
 
-Concrètement, le dictionnaire est implémenté par une instace de la classe \textit{HashBiMap<String, Integer>}. La classe \textit{HashBiMap} est une classe de mapping entre deux types de données. À la différence de la classe \textit{HashMap}, la classe \textit{HashBiMap} ajoute une contrainte d'unicité sur les valeurs des ses éléments. Cette contrainte permet d'activer une \textit{vue inverse} du dictionnaire. C'est à dire, à partir de l'entier unique associé à une URI, on peut retrouver l'URI associée en un temps constant.
+Concrètement, le dictionnaire est implémenté par une instance de la classe \textit{HashBiMap<String, Integer>}. La classe \textit{HashBiMap} est une classe de mapping entre deux types de données. À la différence de la classe \textit{HashMap}, la classe \textit{HashBiMap} ajoute une contrainte d'unicité sur les valeurs de ses éléments. Cette contrainte permet d'activer une \textit{vue inverse} du dictionnaire. C'est-à-dire, à partir de l'entier unique associé à une URI, on peut retrouver l'URI associée en un temps constant.
 
 \begin{lstlisting}[language=Java]
 	public static HashBiMap<String, Integer> dict = HashBiMap.create();
 \end{lstlisting}
 
-\subsubsection{Indexes}
+\subsubsection{Index}
 
-Les indexes sont au coeur de l'approche \textit{hexastore}. Cette approche consiste à définir six indexes. Chaque index contient tout les triplets de la base de données suivant un certain ordre sur ces termes. Ainsi l'index suivant l'ordre \textit{Sujet > Prédicat > Objet} peut-être représenté par un tableau ou la première colonne contient les indentifiants des sujet du triplet, la deuxième colonne contient les prédicat et la dernière contient les objets. Les tuples sont ordonnés d'abords sur la première colonne, puis sur la deuxième ensuite sur la dernière.
+Les index sont au cœur de l'approche \textit{hexastore}. Cette approche consiste à définir six index. Chaque index contient tous les triplets de la base de données suivant un certain ordre sur ces termes. Ainsi l'index suivant l'ordre \textit{Sujet > Prédicat > Objet} peut-être représenté par un tableau ou la première colonne contient les identifiants des sujet du triplet, la deuxième colonne contient les prédicats et la dernière contient les objets. Les tuples sont ordonnés d'abord sur la première colonne, puis sur la deuxième ensuite sur la dernière.
 
-Cette approche permet de minimiser le temps de recherche de l'existance d'un tuple dans la base. Donc si on recherche un tuple oû le sujet est la variable (du style : \textit{?x habite Montpellier}), alors on utilisera un des deux indexes qui met le sujet en dernier. Ici, on utilisera par exemple l'index suivant l'ordre \textit{Objet > Prédicat > Sujet} pour trouver les sujets qui habite à Montpellier.
+Cette approche permet de minimiser le temps de recherche de l'existence d'un tuple dans la base. Donc si on recherche un tuple où le sujet est la variable (du style : \textit{?x habite Montpellier}), alors on utilisera un des deux index qui met le sujet en dernier. Ici, on utilisera par exemple l'index suivant l'ordre \textit{Objet > Prédicat > Sujet} pour trouver les sujets qui habitent à Montpellier.
 
-Dans notre implémentation, on a commencé par définir une classe \textit{Index} qui représente un seul index. Cette classe a comme premier attribut \textit{order}, une chaîne de caractère contenant l'ordre dans lequel sont stockés les termes de chaque triplet. Par exmple pour l'ordre \textit{Sujet > Prédicat > Objet}, l'attribut \textit{order = "spo"}. Cela nous permet de savoir dans quel type d'index on est.
 
-L'index, à proprement parler, est définit comme une imbrication de deux instances de la classe \textit{HashMap} suivit d'une instance de la classe \textit{TreeSet}. La première instance de la classe \textit{HashMap} est un mapping entre l'indentifiant du premier terme \textit{$t_1$} et une autre instance de la classe \textit{HashMap}. Cette dernière, quant à elle, est un mapping entre l'indentifiant du second terme \textit{$t_2$} et une instance de la classe \textit{TreeSet}. Cette instance contient l'ensemble ordonné des derniers termes du triplet composé de $t_1$ et $t_2$.
+Dans notre implémentation, on a commencé par définir une classe \textit{Index} qui représente un seul index. Cette classe a comme premier attribut \textit{order}, une chaîne de caractère contenant l'ordre dans lequel sont stockés les termes de chaque triplet. Par exemple pour l'ordre \textit{Sujet > Prédicat > Objet}, l'attribut \textit{order} vaut : \textit{"spo"}. Cela nous permet de savoir dans quel type d'index on est.
+
+L'index, à proprement parler, est définit comme une imbrication de deux instances de la classe \textit{HashMap} suivit d'une instance de la classe \textit{TreeSet}. La première instance de la classe \textit{HashMap} est un mapping entre l'identifiant du premier terme \textit{$t_1$} et une autre instance de la classe \textit{HashMap}. Cette dernière, quant à elle, est un mapping entre l'identifiant du second terme \textit{$t_2$} et une instance de la classe \textit{TreeSet}. Cette instance contient l'ensemble ordonné des derniers termes du triplet composé de $t_1$ et $t_2$.
 
 \begin{lstlisting}[language=Java]
 	private HashMap<Integer, HashMap<Integer, TreeSet<Integer>>> indexMat;
 \end{lstlisting}
 
-En utilisant cette structure, la recherche au sein d'index se fait par un simple \textit{indexMat.get(int, int)} qui a une complexité constante.
+En utilisant cette structure, la recherche au sein d'un index se fait par un simple \textit{TreeSet indexMat.get(int, int)} qui a une complexité constante.
 
 \subsection{Évaluation des requêtes}
 
 Le programme prend en paramètre un fichier contenant toutes les requêtes à exécuter.
-Dans cette partie, nous détaillerons la partie d'évaluation des requêtes. La lecture et l'évaluation des requêtes se fait de façon parallèle. C'est à dire que le programme interprète une requête puis l'évalue et donne son résultat avant de passer à la suivante.
+Dans cette partie, nous détaillerons la partie d'évaluation des requêtes. La lecture et l'évaluation des requêtes se font de façon parallèle. C'est-à-dire que le programme interprète une requête puis l'évalue et donne son résultat avant de passer à la suivante.
 
 \subsubsection{Lecture}
 
-La lecture et l'interprètation d'une requête se fait par la méthode \textit{parseQuery} de la classe \textit{SPARQLParser} de la bibliothèque \textit{rdf4j}. Elle retourne un objet de la classe \textit{ParsedQuery} qui permet d'acceder à chaque pattern de la requête ainsi que les attributs de ce pattern grâce à différentes méthodes qu'on ne vas pas détailler ici.
+La lecture et l'interprétation d'une requête se font par la méthode \textit{parseQuery} de la classe \textit{SPARQLParser} de la bibliothèque \textit{rdf4j}. Elle retourne un objet de la classe \textit{ParsedQuery} qui permet d'accéder à chaque pattern de la requête ainsi que ses attributs grâce à différentes méthodes qu'on ne va pas détailler ici.
 
-Les requêtes considèrer ici sont des requêtes en étoiles oû la variable est toujours le sujet. Donc on a decider de n'utiliser que l'index \textit{"pos"}.
+Les requêtes considérées ici sont des requêtes en étoiles où la variable est toujours le sujet. Donc on a décidé de n'utiliser que l'index \textit{"pos"}.
 
 \subsubsection{Évaluation}
 
-Afin d'évaluer une requête, on a définit la méthode \textit{processAQuery} qui prends en paramètre une instance de la classe \textit{ParsedQuery} qui se charge d'évaluer la requête. Pour çela, on parcours les patterns (triplets) de la requête un à un et on recherche, au sein de notre index, les sujets apparaissant avec l'objet et le prédicat de ce pattern.
+Afin d'évaluer une requête, on a défini la méthode \textit{processAQuery} qui prends en paramètre une instance de la classe \textit{ParsedQuery} et se charge d'évaluer la requête. Pour cela, on parcourt les patterns (Triplets qui sont de la forme \textit{?x pred obj}) de la requête un à un et on recherche, au sein de notre index, les sujets apparaissant avec l'objet et le prédicat de ce pattern.
 
-On réalise une intersection entre le résultat du premier pattern avec le second, ainsi de suite jusqu'à la fin de la requête. Puisque nous manipulant à ce stade des ensembles ordonnés, cette intersection est faite grâce à un \textit{sort-merge-join} afin d'optimiser le temps d'évaluation finale.
+On réalise une intersection entre le résultat du premier pattern et le résultat du second, ainsi de suite jusqu'à la fin de la requête. Puisque nous manipulant à ce stade des ensembles ordonnés, cette intersection est faite grâce à un \textit{sort-merge-join} afin d'optimiser le temps d'évaluation finale.
+
+\begin{lstlisting}[language=Java, caption="Sort merge join de deux listes"]
+  SortedSet<Integer> merge = new TreeSet<Integer>();
+
+  while (!listA.isEmpty() && !listB.isEmpty()) {
+    if (listA.first() == listB.first()){
+      merge.add(listA.first());
+      listA.remove(listA.first());
+      listB.remove(listB.first());
+    } else if (listA.first() < listB.first()) {
+      listA.remove(listA.first());
+    } else {
+      listB.remove(listB.first());
+    }
+  }
+  return merge;
+\end{lstlisting}
 
 \subsection{Résultats}
 
-\paragraph{Structure}
+Les fichiers résultant de l'exécution du programme sont mis dans le répertoire spécifié avec l'option \textit{-output}.
 
-La Sortie du Programme est un fichier CSV, contenant deux attributs, le numéro de la requête
-et les résultats de la requête sous forme d'une liste contenant toutes les réponses de cette dernière.
-Cette exportation est faite grâce à l'option \textit{exportQueryResult}, cette option évoque la méthode \textit{exportQueryResult()} qui permet de transformer la liste des réponses de toutes les requêtes en un fichier CSV.
+\paragraph{Réponses du moteur}
 
-Le numéro de la requête \textbf{i} dans le fichier CSV représente la requête numéro \textbf{i} dans le fichier des requête. On a pas exporter la requête en elle même, car on ne stocke pas les requête lors de leurs évaluation. Pour faire ça, il faut les stocker au paravant, ou de relire le fichier des requête lors de l'exportation des résultats, donc on a préféré de mettre le numéro dans le fichier CSV, au lieu de la requête en elle même.  
+La sortie du programme est un fichier CSV nommé \textit{queryResult.csv}, contenant deux attributs : le numéro de la requête et les résultats de la requête sous forme d'une liste contenant l'ensemble des réponses de cette dernière.
+Cette exportation est faite si l'option \textit{-export\_query\_results} est spécifié. Cette option invoque la méthode \textit{exportQueryResults()} qui permet de transformer la liste des réponses de toutes les requêtes en un fichier CSV.
+
+Le numéro de la requête $i$ dans le fichier CSV représente la requête numéro $i$ dans le fichier des requêtes. On n'a pas exporté la requête en elle-même, car on ne stocke pas les requêtes lors de leurs évaluations. Donc on a préféré mettre le numéro dans le fichier CSV, au lieu de la requête en elle-même.
 
 \paragraph{Temps d'exécution}
-Les statistiques de notre programme sont exportés dans un fichier CSV contenant les informations suivantes : 
+
+Les statistiques de notre programme sont exportées dans le fichier \textit{stats.csv} contenant les informations suivantes au format CSV : 
 
 \begin{itemize}
-  \item nom du fichier des données.
-  \item nom du fichier contenant les requêtes.
-  \item nombre de triplets RDF
-  \item nombre de requêtes.
-  \item temps de lecture des données (ms) 
-  \item temps de lecture des requêtes (ms)
-  \item temps nécessaire pour la création du dictionnaire (ms).
-  \item temps nécessaire pour la création des indexes (ms). 
-  \item nombre d'indexes.
-  \item temps total d'évaluation du workload (ms). 
-  \item temps total de l'exécution du programme (ms).
+  \item Nom du fichier des données.
+  \item Nom du fichier contenant les requêtes.
+  \item Nombre de triplets RDF
+  \item Nombre de requêtes.
+  \item Temps de lecture des données (ms) 
+  \item Temps de lecture des requêtes (ms)
+  \item Temps de création du dictionnaire (ms).
+  \item Temps de création des index (ms). 
+  \item Nombre d'index.
+  \item Temps total d'évaluation du workload (ms). 
+  \item Temps total de l'exécution du programme (ms).
 
 \end{itemize}
-
-Ces informations sont exportés à l'aide de la méthode \textit{exportStats()} et toutes ces informations sont disponibles.
 
 \section{Conclusion}
 
 \subsection{Utilisation du programme}
-Pour faciliter les tests de notre programme, il est exécutable via ligne de commande, grâce à notre \textit{Makfile} et la commande \textbf{make jar} qui permet de construire un exécutable .jar, aprés la construction du .jar on peut exécuter notre programme avec les options suivantes : 
-java -jar rdfqengine.jar -data "chemin\_vers\_fichier\_données" -queries "chemin\_vers\_fichier\_queries" -output "chemin\_vers\_dossier\_sortie".
 
-Notre Programme reste compilable et exécutable via le \textit{Makfile} avec \textbf{make compil} et \textbf{make run}, mais il faut changer les options à partir du \textit{Makfile}.
+Afin de faciliter les tests de notre programme, il est exécutable via ligne de commande. Après la construction du fichier \textit{jar}, on peut exécuter notre programme avec les options suivantes : 
 
+\begin{lstlisting}[language=Bash]
+  java -jar rdfqengine.jar 
+      -data "chemin/vers/fichier/données.nt" 
+      -queries "chemin/vers/fichier/queries.queryset" 
+      -output "chemin/vers/dossier/sortie/"
+\end{lstlisting}
+
+Notre Programme reste compilable et exécutable via le \textit{Makefile} avec \textbf{make compil} et \textbf{make run}. Les arguments sont paramètrable au sein même du \textit{Makefile}.
+
+\textbf{NB:} N'oubliez pas d'initialiser l'environnement en exécutant le commande \textbf{make init}. 
 
 \subsection{Perspectives}
-On a voulu faire une méthode de validation qui compare notre évaluation des requêtes avec une autre évaluation déjà validée (en utilisant Jena API par exemple).
+
+Dans la seconde partie du projet, un travail de validation des résultats et d'évaluation des performances sera réalisé.
+
 \end{document}
