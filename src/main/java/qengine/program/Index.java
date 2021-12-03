@@ -35,7 +35,7 @@ public class Index {
 
     public SortedSet<Integer> get(int first, int second) {
         if (this.indexMat.get(first) != null && this.indexMat.get(first).get(second) != null)
-            return this.indexMat.get(first).get(second);
+            return new TreeSet<Integer>(this.indexMat.get(first).get(second));
         else
             return new TreeSet<Integer>();
     }
