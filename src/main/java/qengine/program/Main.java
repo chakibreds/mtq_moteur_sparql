@@ -1,5 +1,6 @@
 package qengine.program;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -20,7 +21,6 @@ import com.google.common.collect.HashBiMap;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
-import org.apache.jena.base.Sys;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -67,7 +67,7 @@ final class Main {
 	/**
 	 * Fichier contenant les requêtes sparql
 	 */
-	static String queryFile = workingDir + "sample_query.queryset";
+	static String queryDir = "queries/";
 
 	/**
 	 * Fichier contenant des données rdf
@@ -236,11 +236,17 @@ final class Main {
 		double endTime = System.nanoTime();
 		timeExec.put("load_data", (endTime - startTime) / 1000000L);
 
-		System.out.println("Execution des requêtes contenu dans '" + queryFile + "'.");
-		int nb_queries = parseQueries();
+		System.out.println("Execution des requêtes contenu dans '" + queryDir + "'.");
+		
+		File dirQuery = new File(queryDir);
+		int nb_queries = 0;
+		for(File f : dirQuery.listFiles()){
+			System.out.println("Execution des requêtes contenu dans '" + queryDir + f.getName() + "'.");
+			nb_queries+= parseQueries(f.getName());
 
-		if (export_query_results)
-			exportQueryResults();
+			if (export_query_results)
+			exportQueryResults(f.getName().substring(0, f.getName().lastIndexOf(".")));
+		}
 
 		double endAll = System.nanoTime();
 
@@ -249,11 +255,11 @@ final class Main {
 		System.out.println("Temps d'évaluation des requêtes : " + timeExec.get("processQueries") + " ms");
 		System.out.println("Temps Total du programme: " + timeExec.get("allTime") + " ms\n");
 
-		exportStats(dataFile, queryFile, nb_triplet, nb_queries);
+		exportStats(dataFile, queryDir, nb_triplet, nb_queries);
 	}
 
-	public static void exportQueryResults() {
-		String fileName = outputDir + "queryResult.csv";
+	public static void exportQueryResults(String filequery) {
+		String fileName = outputDir + filequery +"-result.csv";
 		// write all the results in a csv file
 		try {
 			FileWriter writer = new FileWriter(fileName);
@@ -271,7 +277,7 @@ final class Main {
 
 	}
 
-	public static void exportStats(String dataFile, String queryFile, int nb_triplet, int nb_queries) {
+	public static void exportStats(String dataFile, String queryDir, int nb_triplet, int nb_queries) {
 		String fileName = outputDir + "stats.csv";
 		try {
 			FileWriter writer = new FileWriter(fileName);
@@ -282,7 +288,7 @@ final class Main {
 					"temps création dico (ms)", "nombre d’index", "temps de création des index (ms)",
 					"temps total d’évaluation du workload (ms)", "temps total (du début à la fin du programme) (ms)");
 
-			printer.printRecord(dataFile, queryFile, nb_triplet, nb_queries, timeExec.get("load_data"),
+			printer.printRecord(dataFile, queryDir, nb_triplet, nb_queries, timeExec.get("load_data"),
 					timeExec.get("parseQueries"), timeExec.get("timeDico"), dictIndex.size(), timeExec.get("timeIndex"),
 					timeExec.get("processQueries"), timeExec.get("allTime"));
 
@@ -298,7 +304,7 @@ final class Main {
 	public static boolean parseArg(String[] args) {
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].equals("-queries") && (++i < args.length)) {
-				queryFile = args[i];
+				queryDir = args[i];
 			} else if (args[i].equals("-data") && (++i < args.length)) {
 				dataFile = args[i];
 			} else if (args[i].equals("-output") && (++i < args.length)) {
@@ -326,10 +332,10 @@ final class Main {
 	}
 
 	/**
-	 * Traite chaque requête lue dans {@link #queryFile} avec
+	 * Traite chaque requête lue dans {@link #queryDir} avec
 	 * {@link #processAQuery(ParsedQuery)}.
 	 */
-	private static int parseQueries() throws FileNotFoundException, IOException {
+	private static int parseQueries(String filequery) throws FileNotFoundException, IOException {
 		/**
 		 * Try-with-resources
 		 * 
@@ -341,7 +347,7 @@ final class Main {
 		 * les stocker entièrement dans une collection.
 		 */
 		int counter = 0;
-		try (Stream<String> lineStream = Files.lines(Paths.get(queryFile))) {
+		try (Stream<String> lineStream = Files.lines(Paths.get(queryDir+filequery))) {
 			SPARQLParser sparqlParser = new SPARQLParser();
 			Iterator<String> lineIterator = lineStream.iterator();
 			StringBuilder queryString = new StringBuilder();
@@ -378,8 +384,27 @@ final class Main {
 				}
 
 			}
-			timeExec.put("parseQueries", timeParseQueries);
-			timeExec.put("processQueries", timeProcessQueries);
+
+			//time for parse all queries
+			if(timeExec.get("parseQueries") == null){
+				timeExec.put("parseQueries", (timeParseQueries));
+			}
+			else{
+				double parseQueries = timeExec.get("parseQueries");
+				parseQueries += (timeParseQueries);
+				timeExec.put("parseQueries",parseQueries);
+			}
+			
+			//time for process all queries
+			if(timeExec.get("processQueries") == null){
+				timeExec.put("processQueries", (timeProcessQueries));
+			}
+			else{
+				double processQueries = timeExec.get("processQueries");
+				processQueries += (timeProcessQueries);
+				timeExec.put("processQueries",processQueries);
+			}
+			
 		}
 		return counter;
 	}

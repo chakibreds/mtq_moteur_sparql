@@ -1,4 +1,4 @@
-QUERIES=data/STAR_ALL_workload.queryset
+QUERIES=queries/
 DATA=data/100K.nt
 OUTPUT=output/
 
