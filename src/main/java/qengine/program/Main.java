@@ -236,12 +236,13 @@ final class Main {
 		double endTime = System.nanoTime();
 		timeExec.put("load_data", (endTime - startTime) / 1000000L);
 
-		System.out.println("Execution des requêtes contenu dans '" + queryDir + "'.");
+		System.out.println("Execution des requêtes contenu dans le dossier '" + queryDir + "'.");
 		
 		File dirQuery = new File(queryDir);
 		int nb_queries = 0;
 		for(File f : dirQuery.listFiles()){
-			System.out.println("Execution des requêtes contenu dans '" + queryDir + f.getName() + "'.");
+			reponses = new ArrayList<List<String>>();
+			System.out.println("Execution des requêtes contenu dans le fichier '" + queryDir + f.getName() + "'.");
 			nb_queries+= parseQueries(f.getName());
 
 			if (export_query_results)
@@ -283,7 +284,7 @@ final class Main {
 			FileWriter writer = new FileWriter(fileName);
 			CSVPrinter printer = new CSVPrinter(writer, CSVFormat.DEFAULT);
 
-			printer.printRecord("nom du fichier des données", "nom du fichier des reqûetes", "nombre de triplets RDF",
+			printer.printRecord("nom du fichier des données", "nom du dossier des reqûetes", "nombre de triplets RDF",
 					"nombre de requêtes", "temps de lecture des données (ms) ", "temps de lecture des requêtes (ms)",
 					"temps création dico (ms)", "nombre d’index", "temps de création des index (ms)",
 					"temps total d’évaluation du workload (ms)", "temps total (du début à la fin du programme) (ms)");
